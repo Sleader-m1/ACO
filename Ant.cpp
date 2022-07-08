@@ -5,66 +5,66 @@
 #include<iostream>
 
 Ants::Ants(int count_of_ants, int importance_of_pheromone, int importance_of_distance, double evaporation_of_pheromone, double pheromones_from_ant) {
-	ants_count = count_of_ants;  //заносим значение количества муравьёв
-	pheromone_importance = importance_of_pheromone; //заносим значение важности феромона
-	distance_importance = importance_of_distance; //заносим значение важности дистанции
-	pheromones_evaporation = evaporation_of_pheromone; //заносим значение коэффициента испарения
-	pheromone_from_ant = pheromones_evaporation; //заносим значение количества выделяемого одним муравьём феромона на одну дорогу
+	ants_count = count_of_ants;  //Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ  Г¬ГіГ°Г ГўГјВёГў
+	pheromone_importance = importance_of_pheromone; //Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГўГ Г¦Г­Г®Г±ГІГЁ ГґГҐГ°Г®Г¬Г®Г­Г 
+	distance_importance = importance_of_distance; //Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГўГ Г¦Г­Г®Г±ГІГЁ Г¤ГЁГ±ГІГ Г­Г¶ГЁГЁ
+	pheromones_evaporation = evaporation_of_pheromone; //Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГЄГ®ГЅГґГґГЁГ¶ГЁГҐГ­ГІГ  ГЁГ±ГЇГ Г°ГҐГ­ГЁГї
+	pheromone_from_ant = pheromones_evaporation; //Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ  ГўГ»Г¤ГҐГ«ГїГҐГ¬Г®ГЈГ® Г®Г¤Г­ГЁГ¬ Г¬ГіГ°Г ГўГјВёГ¬ ГґГҐГ°Г®Г¬Г®Г­Г  Г­Г  Г®Г¤Г­Гі Г¤Г®Г°Г®ГЈГі
 	vertex_count = 0;
 	indexes_of_traveled_edges.resize(ants_count);
 	best_length = 1000000;
 }
 
 bool Ants::InitGraph(const std::string filename, int beginning_vertex) {
-	bool result = graph.GetGraphFromFile(filename); //вызываем функцию чтения графа из файла и возвращаем то что вернула функция GetGraphFromFile
-	vertex_count = graph.GetSize();//заносим значение количества вершин
+	bool result = graph.GetGraphFromFile(filename); //ГўГ»Г§Г»ГўГ ГҐГ¬ ГґГіГ­ГЄГ¶ГЁГѕ Г·ГІГҐГ­ГЁГї ГЈГ°Г ГґГ  ГЁГ§ ГґГ Г©Г«Г  ГЁ ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬ ГІГ® Г·ГІГ® ГўГҐГ°Г­ГіГ«Г  ГґГіГ­ГЄГ¶ГЁГї GetGraphFromFile
+	vertex_count = graph.GetSize();//Г§Г Г­Г®Г±ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ  ГўГҐГ°ГёГЁГ­
 	for (int k = 0; k < ants_count; ++k) {
 		indexes_of_traveled_edges[k].push_back(beginning_vertex);
 	}
-	return result;//возвращаем вывод функции getGraphFromFile
+	return result;//ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬ ГўГ»ГўГ®Г¤ ГґГіГ­ГЄГ¶ГЁГЁ getGraphFromFile
 }
 
 bool Ants::AntWasInVertex(int ant_num, int vertex_num) {
 	return find(indexes_of_traveled_edges[ant_num].begin(), indexes_of_traveled_edges[ant_num].end(), vertex_num)
-		!= indexes_of_traveled_edges[ant_num].end();//если вершина была пройдена муравьем, то возвращаем true, иначе - false
+		!= indexes_of_traveled_edges[ant_num].end();//ГҐГ±Г«ГЁ ГўГҐГ°ГёГЁГ­Г  ГЎГ»Г«Г  ГЇГ°Г®Г©Г¤ГҐГ­Г  Г¬ГіГ°Г ГўГјГҐГ¬, ГІГ® ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬ true, ГЁГ­Г Г·ГҐ - false
 }
 
 double Ants::ProbabilityOfVertex(int from_city, int to_city, int ant_num) {
-	auto matrix = graph.GetMatrix();//получаем копию матрицы графа
+	auto matrix = graph.GetMatrix();//ГЇГ®Г«ГіГ·Г ГҐГ¬ ГЄГ®ГЇГЁГѕ Г¬Г ГІГ°ГЁГ¶Г» ГЈГ°Г ГґГ 
 
-	double Tij = std::pow(matrix[from_city][to_city].second, pheromone_importance);//вычисляем количество феромона на дуге, возведенное в степень
-	double Nij = std::pow(1 / matrix[from_city][to_city].first, distance_importance);//вычисляем величину, обратную расстоянию, возведенную в степень
+	double Tij = std::pow(matrix[from_city][to_city].second, pheromone_importance);//ГўГ»Г·ГЁГ±Г«ГїГҐГ¬ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГґГҐГ°Г®Г¬Г®Г­Г  Г­Г  Г¤ГіГЈГҐ, ГўГ®Г§ГўГҐГ¤ГҐГ­Г­Г®ГҐ Гў Г±ГІГҐГЇГҐГ­Гј
+	double Nij = std::pow(1 / matrix[from_city][to_city].first, distance_importance);//ГўГ»Г·ГЁГ±Г«ГїГҐГ¬ ГўГҐГ«ГЁГ·ГЁГ­Гі, Г®ГЎГ°Г ГІГ­ГіГѕ Г°Г Г±Г±ГІГ®ГїГ­ГЁГѕ, ГўГ®Г§ГўГҐГ¤ГҐГ­Г­ГіГѕ Гў Г±ГІГҐГЇГҐГ­Гј
 
-	double current_TijNij = Tij * Nij;//запоминаем "привлекательность" текущей вершины
-	double sum = Tij * Nij;//переменная, хранящая "привлекательности" всех вершин
+	double current_TijNij = Tij * Nij;//Г§Г ГЇГ®Г¬ГЁГ­Г ГҐГ¬ "ГЇГ°ГЁГўГ«ГҐГЄГ ГІГҐГ«ГјГ­Г®Г±ГІГј" ГІГҐГЄГіГ№ГҐГ© ГўГҐГ°ГёГЁГ­Г»
+	double sum = Tij * Nij;//ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї, ГµГ°Г Г­ГїГ№Г Гї "ГЇГ°ГЁГўГ«ГҐГЄГ ГІГҐГ«ГјГ­Г®Г±ГІГЁ" ГўГ±ГҐГµ ГўГҐГ°ГёГЁГ­
 
 	if (matrix[from_city][to_city].first > 0) {
 		for (int i = 0; i < vertex_count; ++i) {
 			if (i != to_city && matrix[from_city][i].first > 0)
 				if (!AntWasInVertex(ant_num, i)) {
-					Tij = std::pow(matrix[from_city][to_city].second, pheromone_importance);
-					Nij = std::pow(1 / matrix[from_city][to_city].first, distance_importance);
-					sum += Tij * Nij; //прибавляем "привлекательность" i-й вершины
+					Tij = std::pow(matrix[from_city][i].second, pheromone_importance);
+					Nij = std::pow(1 / matrix[from_city][i].first, distance_importance);
+					sum += Tij * Nij; //ГЇГ°ГЁГЎГ ГўГ«ГїГҐГ¬ "ГЇГ°ГЁГўГ«ГҐГЄГ ГІГҐГ«ГјГ­Г®Г±ГІГј" i-Г© ГўГҐГ°ГёГЁГ­Г»
 				}
 		}
 	}
 	else return 0;
 
-	return current_TijNij / sum;//вычисляем вероятность того, что текущая вершина будет "привлекательнее" других
+	return current_TijNij / sum;//ГўГ»Г·ГЁГ±Г«ГїГҐГ¬ ГўГҐГ°Г®ГїГІГ­Г®Г±ГІГј ГІГ®ГЈГ®, Г·ГІГ® ГІГҐГЄГіГ№Г Гї ГўГҐГ°ГёГЁГ­Г  ГЎГіГ¤ГҐГІ "ГЇГ°ГЁГўГ«ГҐГЄГ ГІГҐГ«ГјГ­ГҐГҐ" Г¤Г°ГіГЈГЁГµ
 }
 
 int Ants::ChooseNextVertex(int ant_num) {
-	int last_vertex_index = indexes_of_traveled_edges[ant_num][indexes_of_traveled_edges[ant_num].size() - 1];//получаем индекс последнего города, в котором муравей был
+	int last_vertex_index = indexes_of_traveled_edges[ant_num][indexes_of_traveled_edges[ant_num].size() - 1];//ГЇГ®Г«ГіГ·Г ГҐГ¬ ГЁГ­Г¤ГҐГЄГ± ГЇГ®Г±Г«ГҐГ¤Г­ГҐГЈГ® ГЈГ®Г°Г®Г¤Г , Гў ГЄГ®ГІГ®Г°Г®Г¬ Г¬ГіГ°Г ГўГҐГ© ГЎГ»Г«
 
-	auto prob_rand = GetProbabilityRand();//получаем случайное дробное число от 0 до 1
-	int i = -1; //счетчик
-	double prob_sum = 0; //переменная хранящая сумму вероятностей
-	while (prob_sum < prob_rand) {//до тех пор пока наше случайное число больше суммы вероятностей счётчик будет увеличиваться
+	auto prob_rand = GetProbabilityRand();//ГЇГ®Г«ГіГ·Г ГҐГ¬ Г±Г«ГіГ·Г Г©Г­Г®ГҐ Г¤Г°Г®ГЎГ­Г®ГҐ Г·ГЁГ±Г«Г® Г®ГІ 0 Г¤Г® 1
+	int i = -1; //Г±Г·ГҐГІГ·ГЁГЄ
+	double prob_sum = 0; //ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї ГµГ°Г Г­ГїГ№Г Гї Г±ГіГ¬Г¬Гі ГўГҐГ°Г®ГїГІГ­Г®Г±ГІГҐГ©
+	while (prob_sum < prob_rand) {//Г¤Г® ГІГҐГµ ГЇГ®Г° ГЇГ®ГЄГ  Г­Г ГёГҐ Г±Г«ГіГ·Г Г©Г­Г®ГҐ Г·ГЁГ±Г«Г® ГЎГ®Г«ГјГёГҐ Г±ГіГ¬Г¬Г» ГўГҐГ°Г®ГїГІГ­Г®Г±ГІГҐГ© Г±Г·ВёГІГ·ГЁГЄ ГЎГіГ¤ГҐГІ ГіГўГҐГ«ГЁГ·ГЁГўГ ГІГјГ±Гї
 		++i;
 		if (!AntWasInVertex(ant_num, i))
-			prob_sum += ProbabilityOfVertex(last_vertex_index, i, ant_num);//прибавляем к сумме вероятность перехода в i-ую вершину
+			prob_sum += ProbabilityOfVertex(last_vertex_index, i, ant_num);//ГЇГ°ГЁГЎГ ГўГ«ГїГҐГ¬ ГЄ Г±ГіГ¬Г¬ГҐ ГўГҐГ°Г®ГїГІГ­Г®Г±ГІГј ГЇГҐГ°ГҐГµГ®Г¤Г  Гў i-ГіГѕ ГўГҐГ°ГёГЁГ­Гі
 	}
-	return i;//возвращаем счётчик, который отсчитал номер города, который выпал случайным выбором
+	return i;//ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬ Г±Г·ВёГІГ·ГЁГЄ, ГЄГ®ГІГ®Г°Г»Г© Г®ГІГ±Г·ГЁГІГ Г« Г­Г®Г¬ГҐГ° ГЈГ®Г°Г®Г¤Г , ГЄГ®ГІГ®Г°Г»Г© ГўГ»ГЇГ Г« Г±Г«ГіГ·Г Г©Г­Г»Г¬ ГўГ»ГЎГ®Г°Г®Г¬
 }
 
 int Ants::HaveValidVertex(int ant_num) {
@@ -88,23 +88,25 @@ void Ants::MakeIteratoin(int iteration_count) {
 		for (int k = 0; k < ants_count; ++k) {
 			while (HaveValidVertex(k) != -1) {
 				auto v = HaveValidVertex(k);
-				indexes_of_traveled_edges[k].push_back(ChooseNextVertex(k));//вводим в вектор индекс вершины, в которую муравей пришел на этом ходу
+				indexes_of_traveled_edges[k].push_back(ChooseNextVertex(k));//ГўГўГ®Г¤ГЁГ¬ Гў ГўГҐГЄГІГ®Г° ГЁГ­Г¤ГҐГЄГ± ГўГҐГ°ГёГЁГ­Г», Гў ГЄГ®ГІГ®Г°ГіГѕ Г¬ГіГ°Г ГўГҐГ© ГЇГ°ГЁГёГҐГ« Г­Г  ГЅГІГ®Г¬ ГµГ®Г¤Гі
 			}
-		}//делаем это для всех муравьев с помощью цикла
+		}//Г¤ГҐГ«Г ГҐГ¬ ГЅГІГ® Г¤Г«Гї ГўГ±ГҐГµ Г¬ГіГ°Г ГўГјГҐГў Г± ГЇГ®Г¬Г®Г№ГјГѕ Г¶ГЁГЄГ«Г 
 
 		for (int i = 0; i < vertex_count; ++i) {
 			for (int j = 0; j < vertex_count; ++j) {
 				if (i != j) {
-					graph.graph_matrix[i][j].second *= (1 - pheromones_evaporation);//проходим по всей матрице кроме диагональных элементов и вычитаем испаренные ферамоны
+					graph.graph_matrix[i][j].second *= (1 - pheromones_evaporation);//ГЇГ°Г®ГµГ®Г¤ГЁГ¬ ГЇГ® ГўГ±ГҐГ© Г¬Г ГІГ°ГЁГ¶ГҐ ГЄГ°Г®Г¬ГҐ Г¤ГЁГ ГЈГ®Г­Г Г«ГјГ­Г»Гµ ГЅГ«ГҐГ¬ГҐГ­ГІГ®Гў ГЁ ГўГ»Г·ГЁГІГ ГҐГ¬ ГЁГ±ГЇГ Г°ГҐГ­Г­Г»ГҐ ГґГҐГ°Г Г¬Г®Г­Г»
 				}
 			}
 		}
 
-		//далее мы будем прибавлять ферамоны к соответствующим рёбрам
-		//в списке пройденных мершин хранится путь муравья, поэтому предыдущий и следующий элементы показывают откуда и куда пошел муравей
+		//Г¤Г Г«ГҐГҐ Г¬Г» ГЎГіГ¤ГҐГ¬ ГЇГ°ГЁГЎГ ГўГ«ГїГІГј ГґГҐГ°Г Г¬Г®Г­Г» ГЄ Г±Г®Г®ГІГўГҐГІГ±ГІГўГіГѕГ№ГЁГ¬ Г°ВёГЎГ°Г Г¬
+		//Гў Г±ГЇГЁГ±ГЄГҐ ГЇГ°Г®Г©Г¤ГҐГ­Г­Г»Гµ Г¬ГҐГ°ГёГЁГ­ ГµГ°Г Г­ГЁГІГ±Гї ГЇГіГІГј Г¬ГіГ°Г ГўГјГї, ГЇГ®ГЅГІГ®Г¬Гі ГЇГ°ГҐГ¤Г»Г¤ГіГ№ГЁГ© ГЁ Г±Г«ГҐГ¤ГіГѕГ№ГЁГ© ГЅГ«ГҐГ¬ГҐГ­ГІГ» ГЇГ®ГЄГ Г§Г»ГўГ ГѕГІ Г®ГІГЄГіГ¤Г  ГЁ ГЄГіГ¤Г  ГЇГ®ГёГҐГ« Г¬ГіГ°Г ГўГҐГ©
 		for (int k = 0; k < ants_count; ++k) {
-			if (indexes_of_traveled_edges[k].size() < vertex_count)
+			if (indexes_of_traveled_edges[k].size() < vertex_count){
+				indexes_of_traveled_edges[k].resize(1);
 				continue;
+			}
 			int index_of_first_visited_city = indexes_of_traveled_edges[k][0];
 			int index_of_last_visited_city = indexes_of_traveled_edges[k][indexes_of_traveled_edges[k].size() - 1];
 
@@ -112,15 +114,15 @@ void Ants::MakeIteratoin(int iteration_count) {
 
 			for (int i = 0; i < indexes_of_traveled_edges[k].size() - 1; ++i) {
 
-				int index_of_fromcity = indexes_of_traveled_edges[k][i];//предыдущий город, в котором был муравей
-				int index_of_tocity = indexes_of_traveled_edges[k][i + 1];//город, в который муравей отправился из предыдущего города
+				int index_of_fromcity = indexes_of_traveled_edges[k][i];//ГЇГ°ГҐГ¤Г»Г¤ГіГ№ГЁГ© ГЈГ®Г°Г®Г¤, Гў ГЄГ®ГІГ®Г°Г®Г¬ ГЎГ»Г« Г¬ГіГ°Г ГўГҐГ©
+				int index_of_tocity = indexes_of_traveled_edges[k][i + 1];//ГЈГ®Г°Г®Г¤, Гў ГЄГ®ГІГ®Г°Г»Г© Г¬ГіГ°Г ГўГҐГ© Г®ГІГЇГ°Г ГўГЁГ«Г±Гї ГЁГ§ ГЇГ°ГҐГ¤Г»Г¤ГіГ№ГҐГЈГ® ГЈГ®Г°Г®Г¤Г 
 
-				double distance_between_cities = graph.graph_matrix[index_of_fromcity][index_of_tocity].first;//расстояние между этими городами
+				double distance_between_cities = graph.graph_matrix[index_of_fromcity][index_of_tocity].first;//Г°Г Г±Г±ГІГ®ГїГ­ГЁГҐ Г¬ГҐГ¦Г¤Гі ГЅГІГЁГ¬ГЁ ГЈГ®Г°Г®Г¤Г Г¬ГЁ
 
 				length += distance_between_cities;
 
-				graph.graph_matrix[index_of_fromcity][index_of_tocity].second += pheromone_from_ant / distance_between_cities;//добавляем ферамон по формуле из теории
-				graph.graph_matrix[index_of_tocity][index_of_fromcity].second += pheromone_from_ant / distance_between_cities;//добавляем в симметричную ячейку матрицы
+				graph.graph_matrix[index_of_fromcity][index_of_tocity].second += pheromone_from_ant / distance_between_cities;//Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ ГґГҐГ°Г Г¬Г®Г­ ГЇГ® ГґГ®Г°Г¬ГіГ«ГҐ ГЁГ§ ГІГҐГ®Г°ГЁГЁ
+				graph.graph_matrix[index_of_tocity][index_of_fromcity].second += pheromone_from_ant / distance_between_cities;//Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ Гў Г±ГЁГ¬Г¬ГҐГІГ°ГЁГ·Г­ГіГѕ ГїГ·ГҐГ©ГЄГі Г¬Г ГІГ°ГЁГ¶Г»
 			}
 
 			length += graph.graph_matrix[index_of_first_visited_city][index_of_last_visited_city].first;
@@ -130,7 +132,7 @@ void Ants::MakeIteratoin(int iteration_count) {
 				best_route = indexes_of_traveled_edges[k];
 			}
 
-			indexes_of_traveled_edges[k].resize(1); //обновляем пройденный путь для k-го муравья, оставляя только начальный город
+			indexes_of_traveled_edges[k].resize(1); //Г®ГЎГ­Г®ГўГ«ГїГҐГ¬ ГЇГ°Г®Г©Г¤ГҐГ­Г­Г»Г© ГЇГіГІГј Г¤Г«Гї k-ГЈГ® Г¬ГіГ°Г ГўГјГї, Г®Г±ГІГ ГўГ«ГїГї ГІГ®Г«ГјГЄГ® Г­Г Г·Г Г«ГјГ­Г»Г© ГЈГ®Г°Г®Г¤
 		}
 
 		std::cout << "On iteration " << iteration + 1 << " the best length is " << best_length << std::endl;
